@@ -2,11 +2,33 @@
   "name": "Build with Harsh",
   "short_name": "BWH",
   "description": "Developer portfolio for software, web development, Linux, Android, and open-source projects.",
-  "start_url": "https://harshverse.me/",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "en-IN",
+  "dir": "ltr",
   "display": "standalone",
   "background_color": "#07111f",
   "theme_color": "#07111f",
   "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "./favicon.svg",
       "sizes": "any",

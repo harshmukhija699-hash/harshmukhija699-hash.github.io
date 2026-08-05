@@ -4,6 +4,7 @@
   const header = document.querySelector("[data-header]");
   const navToggle = document.querySelector("[data-nav-toggle]");
   const navLinks = document.querySelector("[data-nav-links]");
+  const navToggleLabel = navToggle?.querySelector(".sr-only");
   const navAnchors = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
   const sections = Array.from(document.querySelectorAll("main section[id]"));
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -13,17 +14,35 @@
     if (!navToggle || !navLinks) return;
 
     navToggle.setAttribute("aria-expanded", String(open));
+    if (navToggleLabel) navToggleLabel.textContent = open ? "Close navigation" : "Open navigation";
     navLinks.classList.toggle("is-open", open);
     document.body.classList.toggle("nav-open", open && !desktopBreakpoint.matches);
   };
 
-  navToggle?.addEventListener("click", () => {
+  navToggle?.addEventListener("click", (event) => {
     const isOpen = navToggle.getAttribute("aria-expanded") === "true";
-    setMenuState(!isOpen);
+    const willOpen = !isOpen;
+    setMenuState(willOpen);
+
+    if (willOpen && event.detail === 0) navAnchors[0]?.focus();
   });
 
   navAnchors.forEach((anchor) => {
-    anchor.addEventListener("click", () => setMenuState(false));
+    anchor.addEventListener("click", () => {
+      const wasMobileMenuOpen = navToggle?.getAttribute("aria-expanded") === "true" && !desktopBreakpoint.matches;
+      setMenuState(false);
+
+      if (!wasMobileMenuOpen) return;
+
+      const section = document.querySelector(anchor.getAttribute("href"));
+      const heading = section && document.getElementById(section.getAttribute("aria-labelledby"));
+
+      if (!heading) return;
+
+      heading.setAttribute("tabindex", "-1");
+      heading.addEventListener("blur", () => heading.removeAttribute("tabindex"), { once: true });
+      window.requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+    });
   });
 
   document.addEventListener("keydown", (event) => {
@@ -43,9 +62,15 @@
     }
   });
 
-  desktopBreakpoint.addEventListener("change", (event) => {
+  const handleDesktopBreakpoint = (event) => {
     if (event.matches) setMenuState(false);
-  });
+  };
+
+  if (typeof desktopBreakpoint.addEventListener === "function") {
+    desktopBreakpoint.addEventListener("change", handleDesktopBreakpoint);
+  } else {
+    desktopBreakpoint.addListener(handleDesktopBreakpoint);
+  }
 
   let scrollFrame = null;
 
